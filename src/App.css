@@ -1,4 +1,4 @@
-.cardBox {
+/* .cardBox {
     position: relative;
     display: grid;
     place-items: center;
@@ -9,8 +9,9 @@
 
 .card{
     position: relative;
-    z-index: 5; 
-    padding: 5px;
+    background-color: white;
+    margin: 5px 6px 6px 5px;
+   
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
@@ -24,6 +25,7 @@
     background-color: rgba(172, 81, 81, 0.4);
     opacity: 0;
     transition: 0.2s ease-in;
+    border-radius: 10px;
 }
 
 
@@ -61,4 +63,11 @@
 .mini-card:hover .content{
     opacity: 1;
     border-radius: 10px;
-}
+} */
+
+
+.image-gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); /* Adjust the column width as needed */
+    gap: 16px; /* Adjust the gap between images */
+  }

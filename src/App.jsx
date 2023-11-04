@@ -1,14 +1,13 @@
-import { DndProvider } from "react-dnd";
-import { HTML5Backend } from "react-dnd-html5-backend";
-import "./App.css";
-import Gallery from "./Component/Gallery";
+
+// import "./App.css";
+
+import ImageGallery from "./Component/ImageGallery";
 
 function App() {
   return (
     <>
-     <DndProvider backend={HTML5Backend} >
-        <Gallery/>
-     </DndProvider>
+        <ImageGallery/>
+     
     </>
   );
 }
