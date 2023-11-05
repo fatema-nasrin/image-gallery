@@ -41,8 +41,8 @@ const GridImage = ({ images }) => {
     <div
       style={{
         background: "linear-gradient(135deg, #708090, #ffffff)",
-        padding: "20px",
         borderRadius: "10px",
+        padding: "20px",
         boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
         margin: "20px",
       }}
@@ -70,42 +70,51 @@ const GridImage = ({ images }) => {
         <div style={afterStyle}></div>
       </div>
       <DragDropContext onDragEnd={handleDragEnd}>
-        <Droppable droppableId="droppable">
+        <Droppable droppableId="image-gallery">
           {(provided) => (
             <div
               ref={provided.innerRef}
-              {...provided.droppableProps}
-              className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-8 p-10"
+              className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-8 p-6 sm:p-10"
             >
-              {images.map((image, index) => (
-              <Draggable key={image.id} draggableId={image.id} index={index}>
-                {(provided, snapshot) => (
-                  <div
-                    ref={provided.innerRef}
-                    {...provided.draggableProps}
-                    {...provided.dragHandleProps}
-                    style={{
-                      ...provided.draggableProps.style,
-                      transition: snapshot.isDragging
-                        ? 'transform 0.2s ease'
-                        : 'inherit',
-                    }}
-                    className={`relative ${
-                      index === 0
-                        ? "sm:col-span-2 sm:row-span-2"
-                        : "sm:col-span-1 sm:row-span-1"
-                    } flex items-center justify-center `}
-                  >
+              {imageOrder.map((image, index) => (
+                <Draggable key={image.id} draggableId={image.id} index={index}>
+                  {(provided, snapshot) => (
                     <div
-                      
+                      key={image.id}
+                      ref={provided.innerRef}
+                      {...provided.draggableProps}
+                      {...provided.dragHandleProps}
+                      style={{
+                        ...provided.draggableProps.style,
+                        transition: snapshot.isDragging
+                          ? "transform 0.2s ease"
+                          : "inherit",
+                      }}
+                      className={`relative flex justify-center items-center ${
+                        index === 0
+                          ? "md:col-span-2 md:row-span-2"
+                          : "lg:col-span-1 lg:row-span-1"
+                      }`}
                     >
-                      <img src={image.url}  className="w-1/2 h-1/2" />
+                      <div
+                        className={`absolute border-2 rounded-lg border-gray-500 inset-0 z-10 hover:bg-black transition ease-in duration-200 opacity-30 ${
+                          index === 11
+                            ? "border-dashed hover:bg-transparent"
+                            : ""
+                        } `}
+                      ></div>
+                      <div className="absolute inset-0"></div>
+                      <img
+                        src={image.url}
+                        className={`rounded-lg ${
+                          index === 11 ? "py-24 sm:py-0 md:py-0 " : ""
+                        }`}
+                      />
                     </div>
-                  </div>
-                )}
-              </Draggable>
-            ))}
-              {provided.placeholder}
+                  )}
+                </Draggable>
+              ))}
+                 {provided.placeholder}
             </div>
           )}
         </Droppable>
