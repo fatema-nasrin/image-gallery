@@ -23,18 +23,24 @@ const afterStyle = {
 
 const GridImage = ({ images }) => {
   const [imageOrder, setImageOrder] = useState(images);
+  const [draggedImage, setDraggedImage] = useState(null);
+  const dragImageRef = useRef(null);
 
-  const handleDragEnd = (result) => {
-    if (!result.destination) return;
+  const handleDragStart = (index) => {
+    const dragged = imageOrder[index];
+    setDraggedImage(dragged);
+    dragImageRef.current.style.width = `${dragImageRef.current.clientWidth}px`;
+    dragImageRef.current.style.height = `${dragImageRef.current.clientHeight}px`;
+  };
 
-    const sourceIndex = result.source.index;
-    const destinationIndex = result.destination.index;
-
-    if (sourceIndex !== 11 && destinationIndex !== 11) {
-      const items = Array.from(imageOrder);
-      const [reorderedItem] = items.splice(sourceIndex, 1);
-      items.splice(destinationIndex, 0, reorderedItem);
-      setImageOrder(items);
+  const handleDragEnd = (index) => {
+    if (draggedImage !== null) {
+      const newImageOrder = [...imageOrder];
+      newImageOrder[index] = draggedImage;
+      setImageOrder(newImageOrder);
+      setDraggedImage(null);
+      dragImageRef.current.style.width = 'auto';
+      dragImageRef.current.style.height = 'auto';
     }
   };
   return (
@@ -87,10 +93,12 @@ const GridImage = ({ images }) => {
                       style={{
                         ...provided.draggableProps.style,
                         transition: snapshot.isDragging
-                          ? "transform 0.2s ease"
-                          : "inherit",
+                        ? 'transform 0.2s ease'
+                        : 'inherit',
                       }}
-                      className={`relative flex justify-center items-center ${
+                      className={`${
+                        index === 11 ? "pointer-events-none" : ""
+                      } relative flex justify-center items-center ${
                         index === 0
                           ? "md:col-span-2 md:row-span-2"
                           : "lg:col-span-1 lg:row-span-1"
@@ -103,7 +111,6 @@ const GridImage = ({ images }) => {
                             : ""
                         } `}
                       ></div>
-                      <div className="absolute inset-0"></div>
                       <img
                         src={image.url}
                         className={`rounded-lg ${
@@ -114,7 +121,13 @@ const GridImage = ({ images }) => {
                   )}
                 </Draggable>
               ))}
-                 {provided.placeholder}
+               <div
+              className="absolute w-full h-full bg-transparent"
+              style={{
+                display: 'none', // Hide this element
+              }}
+            />
+              {provided.placeholder}
             </div>
           )}
         </Droppable>
