@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 import { TypeAnimation } from "react-type-animation";
+import ReactiveButton from "reactive-button";
 
 const headingStyle = {
   position: "relative",
@@ -23,26 +24,43 @@ const afterStyle = {
 
 const GridImage = ({ images }) => {
   const [imageOrder, setImageOrder] = useState(images);
-  const [draggedImage, setDraggedImage] = useState(null);
-  const dragImageRef = useRef(null);
+  const [selectedImages, setSelectedImages] = useState([]);
+  const [deleteButtonState, setDeleteButtonState] = useState('idle'); 
 
-  const handleDragStart = (index) => {
-    const dragged = imageOrder[index];
-    setDraggedImage(dragged);
-    dragImageRef.current.style.width = `${dragImageRef.current.clientWidth}px`;
-    dragImageRef.current.style.height = `${dragImageRef.current.clientHeight}px`;
+
+  const handleDragEnd = (result) => {
+    if (!result.destination) return; 
+
+    const reorderedImages = [...imageOrder];
+    const [reorderedImage] = reorderedImages.splice(result.source.index, 1);
+    reorderedImages.splice(result.destination.index, 0, reorderedImage);
+
+    setImageOrder(reorderedImages);
   };
 
-  const handleDragEnd = (index) => {
-    if (draggedImage !== null) {
-      const newImageOrder = [...imageOrder];
-      newImageOrder[index] = draggedImage;
-      setImageOrder(newImageOrder);
-      setDraggedImage(null);
-      dragImageRef.current.style.width = 'auto';
-      dragImageRef.current.style.height = 'auto';
+  const handleImageSelection = (imageId) => {
+    if (selectedImages.includes(imageId)) {
+      setSelectedImages(selectedImages.filter((id) => id !== imageId));
+    } else {
+      setSelectedImages([...selectedImages, imageId]);
     }
   };
+
+  const handleDeleteSelectedImages = () => {
+    setDeleteButtonState('loading'); 
+    setTimeout(() => {
+      const updatedImages = imageOrder.filter((image) => !selectedImages.includes(image.id));
+      setImageOrder(updatedImages);
+      setSelectedImages([]);
+      setDeleteButtonState('success');
+    }, 2000 );
+    setTimeout(() => {
+      setDeleteButtonState('idle');
+    }, 2000);
+      
+  };
+
+
   return (
     <div
       style={{
@@ -50,7 +68,7 @@ const GridImage = ({ images }) => {
         borderRadius: "10px",
         padding: "20px",
         boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
-        margin: "20px",
+        margin: "50px",
       }}
     >
       <div style={headingStyle}>
@@ -76,8 +94,9 @@ const GridImage = ({ images }) => {
         <div style={afterStyle}></div>
       </div>
       <DragDropContext onDragEnd={handleDragEnd}>
-        <Droppable droppableId="image-gallery">
-          {(provided) => (
+        <Droppable droppableId="image-gallery" direction="horizontal">
+        
+         {(provided) => (
             <div
               ref={provided.innerRef}
               className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-8 p-6 sm:p-10"
@@ -86,15 +105,18 @@ const GridImage = ({ images }) => {
                 <Draggable key={image.id} draggableId={image.id} index={index}>
                   {(provided, snapshot) => (
                     <div
-                      key={image.id}
                       ref={provided.innerRef}
                       {...provided.draggableProps}
                       {...provided.dragHandleProps}
+                      onClick={() => handleImageSelection(image.id)}
                       style={{
                         ...provided.draggableProps.style,
                         transition: snapshot.isDragging
-                        ? 'transform 0.2s ease'
-                        : 'inherit',
+                          ? "transform 0.2s ease"
+                          : "inherit",
+                        boxShadow: selectedImages.includes(image.id)
+                          ? "0 0 8px 2px #FF0000"
+                          : "0 0 8px 2px transparent",
                       }}
                       className={`${
                         index === 11 ? "pointer-events-none" : ""
@@ -105,33 +127,49 @@ const GridImage = ({ images }) => {
                       }`}
                     >
                       <div
-                        className={`absolute border-2 rounded-lg border-gray-500 inset-0 z-10 hover:bg-black transition ease-in duration-200 opacity-30 ${
-                          index === 11
-                            ? "border-dashed hover:bg-transparent"
+                        className={`absolute border-2 rounded-lg border-gray-500 inset-0 z-10   hover:bg-black transition ease-in duration-200 opacity-30 ${
+                          selectedImages.includes(image.id)
+                            ? "hover:bg-transparent"
                             : ""
-                        } `}
+                        } && ${index === 11
+                          ? "border-dashed hover:bg-transparent"
+                          : ""} `}
                       ></div>
                       <img
                         src={image.url}
+                        alt={`Image ${index}`}
                         className={`rounded-lg ${
-                          index === 11 ? "py-24 sm:py-0 md:py-0 " : ""
+                          index === 11 ? "py-24 sm:py-0 md:py-0" : ""
                         }`}
                       />
                     </div>
                   )}
                 </Draggable>
               ))}
-               <div
-              className="absolute w-full h-full bg-transparent"
-              style={{
-                display: 'none', // Hide this element
-              }}
-            />
               {provided.placeholder}
             </div>
           )}
+      
         </Droppable>
       </DragDropContext>
+    
+   <div className="flex justify-between">
+   <div>
+    {selectedImages.length > 0 && (
+        <p className="text-black font-bold md:text-2xl">Number Of Selected image: {selectedImages.length}</p>
+      )}
+    </div>
+     <div>
+     {selectedImages.length > 0 && (
+        <ReactiveButton
+          buttonState={deleteButtonState}
+          onClick={handleDeleteSelectedImages}
+          className="text-white bg-lime-950 rounded-lg"
+          />
+          )}
+     </div>
+   </div>
+          
     </div>
   );
 };
