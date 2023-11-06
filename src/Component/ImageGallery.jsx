@@ -1,4 +1,5 @@
-import GridImage from "./GridImage";
+import GridImage from "./GridImage/GridImage";
+
 
 
 const ImageGallery = () => {

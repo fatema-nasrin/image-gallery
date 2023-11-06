@@ -65,9 +65,3 @@
     border-radius: 10px;
 } */
 
-
-.image-gallery-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); /* Adjust the column width as needed */
-    gap: 16px; /* Adjust the gap between images */
-  }

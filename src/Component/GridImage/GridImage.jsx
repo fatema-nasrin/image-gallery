@@ -2,6 +2,7 @@ import { useState } from "react";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 import { TypeAnimation } from "react-type-animation";
 import ReactiveButton from "reactive-button";
+import "./GridImage.css";
 
 const headingStyle = {
   position: "relative",
@@ -100,7 +101,7 @@ const GridImage = ({ images }) => {
               className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-8 p-6 sm:p-10"
             >
               {imageOrder.map((image, index) => (
-                <Draggable key={image.id} draggableId={image.id} index={index}  >
+                <Draggable key={image.id} draggableId={image.id} index={index}>
                   {(provided) => (
                     <div
                       ref={provided.innerRef}
@@ -127,10 +128,10 @@ const GridImage = ({ images }) => {
                             ? "hover-bg-transparent"
                             : ""
                         } && ${
-                        index === 11
-                          ? "border-dashed hover-bg-transparent"
-                          : ""
-                      } `}
+                          index === 11
+                            ? "bg-slate-400 opacity-20 border-dashed hover-bg-transparent"
+                            : ""
+                        } `}
                       ></div>
                       <img
                         src={image.url}
@@ -162,7 +163,7 @@ const GridImage = ({ images }) => {
             <ReactiveButton
               buttonState={deleteButtonState}
               onClick={handleDeleteSelectedImages}
-              className="text-white bg-lime-950 rounded-lg"
+              className="text-white bg-lime-950 rounded-lg custom-button"
             />
           )}
         </div>
