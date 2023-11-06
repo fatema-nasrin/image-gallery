@@ -26,29 +26,29 @@ const borderStyle = {
 };
 
 const GridImage = ({ images }) => {
-  const [imageOrder, setImageOrder] = useState(images.map((image, index) => ({ ...image, order: index }))); // for re-ordering images
+  const [imageOrder, setImageOrder] = useState(
+    images.map((image, index) => ({ ...image, order: index }))
+  );
+  // for re-ordering images
   const [selectedImages, setSelectedImages] = useState([]); // for select images
   const [deleteButtonState, setDeleteButtonState] = useState("idle"); // for delete button
 
   const handleDragEnd = (result) => {
     if (!result.destination) return;
-  
+
     const reorderedImages = [...imageOrder];
     const sourceIndex = result.source.index;
     const destIndex = result.destination.index;
-  
+
     const [movedImage] = reorderedImages.splice(sourceIndex, 1);
     reorderedImages.splice(destIndex, 0, movedImage);
-  
-    // Update the order property for each image
+
     reorderedImages.forEach((image, index) => {
       image.order = index;
     });
-  
+
     setImageOrder(reorderedImages);
   };
-  
-  
 
   const handleImageSelection = (imageId) => {
     if (selectedImages.includes(imageId)) {
@@ -127,50 +127,49 @@ const GridImage = ({ images }) => {
                   }`}
                 >
                   {image.order === 11 ? (
-  <div className="relative flex justify-center items-center  border-2 rounded-lg border-gray-500 border-dashed">
-    <img
-      src={image.url}
-      alt={`Image ${index}`}
-      className="rounded-lg p-20 sm:p-20 md:p-8 lg:p-16"
-    />
-  </div>
-) : (
-  <Draggable
-    key={image.id}
-    draggableId={image.id}
-    index={index}
-  >
-    {(dragProvided) => (
-      <div
-        ref={dragProvided.innerRef}
-        {...dragProvided.draggableProps}
-        {...dragProvided.dragHandleProps}
-        onClick={() => handleImageSelection(image.id)}
-        style={{
-          ...dragProvided.draggableProps.style,
-          boxShadow: selectedImages.includes(image.id)
-            ? "0 0 8px 2px #FF0000"
-            : "0 0 8px 2px transparent",
-        }}
-        className="relative flex justify-center items-center"
-      >
-        <div
-          className={` absolute border-2 rounded-lg border-gray-500 inset-0 z-10 hover:bg-black transition ease-in duration-200 opacity-30 ${
-            selectedImages.includes(image.id)
-              ? "hover-bg-transparent"
-              : ""
-          }`}
-        ></div>
-        <img
-          src={image.url}
-          alt={`Image ${index}`}
-          className="rounded-lg"
-        />
-      </div>
-    )}
-  </Draggable>
-)}
-
+                    <div className="relative flex justify-center items-center border-2 rounded-lg border-gray-500 border-dashed">
+                      <img
+                        src={image.url}
+                        alt={`Image ${index}`}
+                        className="rounded-lg p-20 sm:p-20 md:p-8 lg:p-16"
+                      />
+                    </div>
+                  ) : (
+                    <Draggable
+                      key={image.id}
+                      draggableId={image.id}
+                      index={image.order} 
+                    >
+                      {(dragProvided) => (
+                        <div
+                          ref={dragProvided.innerRef}
+                          {...dragProvided.draggableProps}
+                          {...dragProvided.dragHandleProps}
+                          onClick={() => handleImageSelection(image.id)}
+                          style={{
+                            ...dragProvided.draggableProps.style,
+                            boxShadow: selectedImages.includes(image.id)
+                              ? "0 0 8px 2px #FF0000"
+                              : "0 0 8px 2px transparent",
+                          }}
+                          className="relative flex justify-center items-center"
+                        >
+                          <div
+                            className={` absolute border-2 rounded-lg border-gray-500 inset-0 z-10 hover:bg-black transition ease-in duration-200 opacity-30 ${
+                              selectedImages.includes(image.id)
+                                ? "hover-bg-transparent"
+                                : ""
+                            }`}
+                          ></div>
+                          <img
+                            src={image.url}
+                            alt={`Image ${index}`}
+                            className="rounded-lg"
+                          />
+                        </div>
+                      )}
+                    </Draggable>
+                  )}
                 </div>
               )}
             </Droppable>
