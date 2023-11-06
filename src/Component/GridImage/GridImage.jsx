@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 import { TypeAnimation } from "react-type-animation";
 import ReactiveButton from "reactive-button";
@@ -32,8 +32,15 @@ const GridImage = ({ images }) => {
     if (!result.destination) return;
 
     const reorderedImages = [...imageOrder];
-    const [reorderedImage] = reorderedImages.splice(result.source.index, 1);
-    reorderedImages.splice(result.destination.index, 0, reorderedImage);
+    const sourceIndex = result.source.index;
+    const destIndex = result.destination.index;
+
+    const sourceImage = reorderedImages[sourceIndex];
+    const destImage = reorderedImages[destIndex];
+
+    // Swap the source and destination images
+    reorderedImages[sourceIndex] = destImage;
+    reorderedImages[destIndex] = sourceImage;
 
     setImageOrder(reorderedImages);
   };
@@ -94,60 +101,67 @@ const GridImage = ({ images }) => {
         <div style={borderStyle}></div>
       </div>
       <DragDropContext onDragEnd={handleDragEnd}>
-        <Droppable droppableId="image-gallery" direction="horizontal">
-          {(provided) => (
-            <div
-              ref={provided.innerRef}
-              className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-8 p-6 sm:p-10"
+        <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-8 p-6 sm:p-10">
+          {imageOrder.map((image, index) => (
+            <Droppable
+              key={index}
+              droppableId={`image-gallery-${index}`}
+              direction="horizontal"
             >
-              {imageOrder.map((image, index) => (
-                <Draggable key={image.id} draggableId={image.id} index={index}>
-                  {(provided) => (
-                    <div
-                      ref={provided.innerRef}
-                      {...provided.draggableProps}
-                      {...provided.dragHandleProps}
-                      onClick={() => handleImageSelection(image.id)}
-                      style={{
-                        ...provided.draggableProps.style,
-                        boxShadow: selectedImages.includes(image.id)
-                          ? "0 0 8px 2px #FF0000"
-                          : "0 0 8px 2px transparent",
-                      }}
-                      className={`${
-                        index === 11 ? "pointer-events-none" : ""
-                      } relative flex justify-center items-center ${
-                        index === 0
-                          ? "md:col-span-2 md:row-span-2"
-                          : "md:col-span-1 md:row-span-1"
-                      }`}
-                    >
+              {(provided) => (
+                <div
+                  ref={(node) => provided.innerRef(node)}
+                  className={`relative flex justify-center items-center ${
+                    index === 0
+                      ? "md:col-span-2 md:row-span-2"
+                      : "md:col-span-1 md:row-span-1"
+                  }`}
+                >
+                  <Draggable
+                    key={image.id}
+                    draggableId={image.id}
+                    index={index}
+                  >
+                    {(dragProvided) => (
                       <div
-                        className={`absolute border-2 rounded-lg border-gray-500 inset-0 z-10   hover:bg-black transition ease-in duration-200 opacity-30 ${
-                          selectedImages.includes(image.id)
-                            ? "hover-bg-transparent"
-                            : ""
-                        } && ${
-                          index === 11
-                            ? "bg-slate-400 opacity-20 border-dashed hover-bg-transparent"
-                            : ""
-                        } `}
-                      ></div>
-                      <img
-                        src={image.url}
-                        alt={`Image ${index}`}
-                        className={`rounded-lg ${
-                          index === 11 ? "py-24 sm:py-0 md:py-0" : ""
-                        }`}
-                      />
-                    </div>
-                  )}
-                </Draggable>
-              ))}
-              {provided.placeholder}
-            </div>
-          )}
-        </Droppable>
+                        ref={dragProvided.innerRef}
+                        {...dragProvided.draggableProps}
+                        {...dragProvided.dragHandleProps}
+                        onClick={() => handleImageSelection(image.id)}
+                        style={{
+                          ...dragProvided.draggableProps.style,
+                          boxShadow: selectedImages.includes(image.id)
+                            ? "0 0 8px 2px #FF0000"
+                            : "0 0 8px 2px transparent",
+                        }}
+                        className={`relative flex justify-center items-center`}
+                      >
+                        <div
+                          className={`absolute border-2 rounded-lg border-gray-500 inset-0 z-10 hover:bg-black transition ease-in duration-200 opacity-30 ${
+                            selectedImages.includes(image.id)
+                              ? "hover-bg-transparent"
+                              : ""
+                          } && ${
+                            index === 11
+                              ? "bg-slate-400 opacity-20 border-dashed hover-bg-transparent"
+                              : ""
+                          } `}
+                        ></div>
+                        <img
+                          src={image.url}
+                          alt={`Image ${index}`}
+                          className={`rounded-lg ${
+                            index === 11 ? "py-24 sm:py-0 md:py-0" : ""
+                          }`}
+                        />
+                      </div>
+                    )}
+                  </Draggable>
+                </div>
+              )}
+            </Droppable>
+          ))}
+        </div>
       </DragDropContext>
 
       <div className="flex justify-between">
